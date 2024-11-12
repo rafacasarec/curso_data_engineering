@@ -1,0 +1,105 @@
+version: 2
+
+sources:
+
+  - name: sql_server_dbo
+    schema : sql_server_dbo
+    database: ALUMNO16_DEV_BRONZE_DB
+
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    freshness:
+      warn_after: {count: 365, period: day}
+      error_after: {count: 500, period: day}
+
+    tables:
+
+      - name: events
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: created_at
+          - name: event_id
+          - name: event_type
+          - name: order_id
+          - name: page_url
+          - name: product_id
+          - name: session_id
+          - name: user_id
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+      
+      - name: addresses
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: address
+          - name: address_id
+          - name: country
+          - name: state
+          - name: zipcode
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+      
+      - name: orders
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: address_id
+          - name: created_at
+          - name: delivered_at
+          - name: estimated_delivered
+          - name: order_cost
+          - name: order_id
+          - name: order_total
+          - name: promo_id
+          - name: shipping_cost
+          - name: shipping_service
+          - name: status
+          - name: tracking_id
+          - name: user_id
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+      
+      - name: order_items
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: order_id
+          - name: product_id
+          - name: quantity
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+
+      - name: products
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: inventory
+          - name: name
+          - name: price
+          - name: product_id
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+
+      - name: promos
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: discount
+          - name: promo_id
+          - name: status
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+
+      - name: users
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: address_id
+          - name: created_at
+          - name: email
+          - name: first_name
+          - name: last_name
+          - name: phone_number
+          - name: total_orders
+          - name: update_at
+          - name: user_id
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
