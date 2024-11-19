@@ -21,13 +21,21 @@ sources:
         loaded_at_field: _fivetran_synced
         columns:
           - name: created_at
+            tests:
+              - not_null
           - name: event_id
+            tests:
+              - unique
+              - not_null
           - name: event_type
+           
           - name: order_id
           - name: page_url
           - name: product_id
           - name: session_id
           - name: user_id
+            tests:
+              - not_null
           - name: _fivetran_deleted
           - name: _fivetran_synced
       
@@ -36,6 +44,9 @@ sources:
         columns:
           - name: address
           - name: address_id
+            tests:
+              - unique
+              - not_null
           - name: country
           - name: state
           - name: zipcode
@@ -46,11 +57,20 @@ sources:
         loaded_at_field: _fivetran_synced
         columns:
           - name: address_id
+            tests:
+              - relationships:
+                  field: address_id
+                  to: ref('sql_server_dbo.addresses')
           - name: created_at
+            tests:
+              - not_null
           - name: delivered_at
           - name: estimated_delivered
           - name: order_cost
           - name: order_id
+            tests:
+              - unique
+              - not_null
           - name: order_total
           - name: promo_id
           - name: shipping_cost
@@ -58,6 +78,10 @@ sources:
           - name: status
           - name: tracking_id
           - name: user_id
+            tests:
+              - relationships:
+                  field: user_id
+                  to: ref('sql_server_dbo.users')
           - name: _fivetran_deleted
           - name: _fivetran_synced
       
@@ -67,6 +91,8 @@ sources:
           - name: order_id
           - name: product_id
           - name: quantity
+            tests:
+              - not_null
           - name: _fivetran_deleted
           - name: _fivetran_synced
 
@@ -74,9 +100,16 @@ sources:
         loaded_at_field: _fivetran_synced
         columns:
           - name: inventory
+            tests:
+              - not_null
           - name: name
           - name: price
+            tests:
+              - not_null
           - name: product_id
+            tests:
+              - not_null
+              - unique
           - name: _fivetran_deleted
           - name: _fivetran_synced
 
@@ -84,8 +117,12 @@ sources:
         loaded_at_field: _fivetran_synced
         columns:
           - name: discount
+            tests:
+              - not_null
           - name: promo_id
           - name: status
+            tests:
+              - not_null
           - name: _fivetran_deleted
           - name: _fivetran_synced
 
@@ -95,11 +132,16 @@ sources:
           - name: address_id
           - name: created_at
           - name: email
+            tests:
+              - not_null
           - name: first_name
           - name: last_name
           - name: phone_number
           - name: total_orders
           - name: update_at
           - name: user_id
+            tests:
+              - not_null
+              - unique
           - name: _fivetran_deleted
           - name: _fivetran_synced

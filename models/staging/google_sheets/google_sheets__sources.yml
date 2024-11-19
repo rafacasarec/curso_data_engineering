@@ -22,6 +22,11 @@ sources:
         columns:
           - name: _row
           - name: product_id
+            tests:
+              - not_null
+              - relationships:
+                  field: product_id
+                  to: ref('sql_server_dbo.products')
           - name: quantity
           - name: month
           - name: _fivetran_synced

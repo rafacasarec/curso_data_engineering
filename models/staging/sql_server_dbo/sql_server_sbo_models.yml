@@ -1,0 +1,280 @@
+version: 2
+
+models:
+  - name: stg_sql_server_dbo__events
+    description: "Modelo transformado de la tabla 'events' para estandarizar columnas y manejar valores nulos en product_id y order_id."
+    columns:
+      - name: event_id
+        description: "Identificador único del evento."
+        tests:
+          - not_null
+          - unique
+      - name: page_url
+        description: "URL de la página asociada al evento."
+        tests:
+          - not_null
+      - name: event_type
+        description: "Tipo de evento realizado (por ejemplo, 'view_product', 'place_order', etc.)."
+        tests:
+          - not_null
+      - name: user_id
+        description: "Identificador único del usuario asociado al evento."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__users')
+              field: user_id
+      - name: product_id
+        description: "Identificador del producto visto o interactuado durante el evento. Si no hay producto, se asigna 'null'."
+        tests:
+          - not_null
+      - name: session_id
+        description: "Identificador único de la sesión del usuario en el sitio web."
+        tests:
+          - not_null
+      - name: event_timestamp_UTC
+        description: "Marca de tiempo del evento convertido a UTC."
+        tests:
+          - not_null
+      - name: order_id
+        description: "Identificador de la orden asociada al evento. Si no aplica, se asigna 'null'."
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: date_load
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+
+  - name: stg_sql_server_dbo__addresses
+    description: "Modelo transformado de la tabla 'addresses' que descompone las direcciones en número y calle, y realiza limpieza de columnas."
+    columns:
+      - name: address_id
+        description: "Identificador único de la dirección."
+        tests:
+          - not_null
+          - unique
+      - name: zipcode
+        description: "Código postal asociado a la dirección."
+        tests:
+          - not_null
+      - name: country
+        description: "País al que pertenece la dirección."
+        tests:
+          - not_null
+      - name: address
+        description: "Texto completo de la dirección, incluyendo número y calle."
+        tests:
+          - not_null
+      - name: state
+        description: "Estado o provincia al que pertenece la dirección."
+      - name: address_number
+        description: "Número de la dirección extraído usando expresiones regulares."
+        tests:
+          - not_null
+
+      - name: address_street
+        description: "Nombre de la calle extraído usando expresiones regulares."
+        tests:
+          - not_null
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: data_loaded
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+        tests:
+          - not_null
+
+
+  - name: stg_sql_server_dbo__order_items
+    description: "Modelo transformado de la tabla 'order_items' que genera un identificador único para cada item de pedido (order_item_id) y estandariza columnas."
+    columns:
+      - name: order_item_id
+        description: "Identificador único para cada combinación de order_id y product_id, generado mediante un hash (MD5)."
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "Identificador del pedido al que pertenece el item."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__orders')
+              field: order_id
+      - name: product_id
+        description: "Identificador del producto asociado al item del pedido."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__products')
+              field: product_id
+      - name: quantity
+        description: "Cantidad de productos asociados al item del pedido."
+        tests:
+          - not_null
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: date_load
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+        tests:
+          - not_null
+
+
+  - name: stg_sql_server_dbo__orders
+    description: "Modelo transformado de la tabla 'orders' que estandariza columnas, maneja valores nulos y añade identificadores hasheados para las promociones."
+    columns:
+      - name: order_id
+        description: "Identificador único del pedido."
+        tests:
+          - not_null
+          - unique
+      - name: shipping_service
+        description: "Método de envío asociado al pedido. Si está vacío, se asigna 'sin enviar'."
+      - name: shipping_cost
+        description: "Costo del envío del pedido."
+        tests:
+          - not_null
+      - name: address_id
+        description: "Identificador único de la dirección asociada al pedido."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__addresses')
+              field: address_id
+      - name: created_at_utc
+        description: "Fecha y hora en que se creó el pedido, convertida a UTC."
+        tests:
+          - not_null
+      - name: promo_id
+        description: "Identificador único de la promoción asociada al pedido. Hasheado con MD5. Si no hay promoción, se asigna 'sin promocion'."
+      - name: desc_promo
+        description: "Descripción de la promoción asociada al pedido. Si no hay promoción, se asigna 'sin promocion'."
+      - name: estimated_delivery_at_utc
+        description: "Fecha y hora estimada para la entrega del pedido, convertida a UTC."
+      - name: order_cost
+        description: "Costo total del pedido antes de aplicar descuentos o promociones."
+        tests:
+          - not_null
+      - name: user_id
+        description: "Identificador único del usuario que realizó el pedido."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__users')
+              field: user_id
+      - name: order_total
+        description: "Costo total del pedido después de aplicar descuentos y promociones."
+        tests:
+          - not_null
+      - name: delivered_at_utc
+        description: "Fecha y hora en que se entregó el pedido, convertida a UTC."
+      - name: tracking_id
+        description: "Identificador de seguimiento del envío. Si está vacío, se asigna 'sin enviar'."
+      - name: status
+        description: "Estado actual del pedido (e.g., 'pendiente', 'entregado')."
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: date_load
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+        tests:
+          - not_null
+
+
+  - name: stg_sql_server_dbo__products
+    description: "Modelo transformado de la tabla 'products' que limpia y estandariza columnas relacionadas con productos."
+    columns:
+      - name: product_id
+        description: "Identificador único del producto."
+        tests:
+          - not_null
+          - unique
+      - name: price
+        description: "Precio del producto, convertido al formato decimal con dos decimales."
+        tests:
+          - not_null
+      - name: desc_product
+        description: "Descripción o nombre del producto."
+        tests:
+          - not_null
+      - name: inventory
+        description: "Cantidad disponible del producto en el inventario."
+        tests:
+          - not_null
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: date_load
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+        tests:
+          - not_null
+
+
+  - name: stg_sql_server_dbo__promos
+    description: "Modelo transformado de la tabla 'promos' que limpia, estandariza columnas y agrega una promoción predeterminada ('sin promocion') para manejar valores nulos."
+    columns:
+      - name: promo_id
+        description: "Identificador único de la promoción, generado como un hash (MD5)."
+        tests:
+          - not_null
+          - unique
+      - name: desc_promo
+        description: "Descripción de la promoción asociada al identificador."
+        tests:
+          - not_null
+      - name: discount
+        description: "Porcentaje o monto de descuento asociado a la promoción. Si no aplica, el descuento es 0."
+        tests:
+          - not_null
+      - name: status
+        description: "Estado actual de la promoción (e.g., 'active', 'inactive')."
+        tests:
+          - not_null
+          - accepted_values:  # Validar que solo se permitan valores específicos
+              values: ['active', 'inactive', 'expired']
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: data_loaded
+        description: "Marca de tiempo que indica cuándo se sincronizó o creó el registro en la base de datos."
+        tests:
+          - not_null
+
+
+  - name: stg_sql_server_dbo__users
+    description: "Modelo transformado de la tabla 'users' que estandariza columnas y convierte las marcas de tiempo a UTC."
+    columns:
+      - name: user_id
+        description: "Identificador único del usuario."
+        tests:
+          - not_null
+          - unique
+      - name: address_id
+        description: "Identificador único de la dirección asociada al usuario."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__addresses')
+              field: address_id
+      - name: first_name
+        description: "Primer nombre del usuario."
+        tests:
+          - not_null
+      - name: last_name
+        description: "Apellido del usuario."
+        tests:
+          - not_null
+      - name: phone_number
+        description: "Número de teléfono asociado al usuario."
+      - name: email
+        description: "Correo electrónico del usuario."
+        tests:
+          - not_null
+          - unique
+      - name: updated_at_utc
+        description: "Fecha y hora de la última actualización del usuario, convertida a UTC."
+      - name: created_at_utc
+        description: "Fecha y hora de creación del usuario, convertida a UTC."
+        tests:
+          - not_null
+      - name: total_orders
+        description: "Cantidad total de pedidos realizados por el usuario."
+      - name: _fivetran_deleted
+        description: "Indicador de eliminación del registro en la fuente original."
+      - name: data_loaded
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+        tests:
+          - not_null

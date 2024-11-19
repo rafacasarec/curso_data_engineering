@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_google_sheets__budget
+    description: "Modelo transformado de la tabla 'budget' que genera un identificador único para cada combinación de cantidad y producto, y agrega información de mes y año."
+    columns:
+      - name: budget_id
+        description: "Identificador único del presupuesto, generado como un hash (MD5) a partir de quantity y product_id."
+        tests:
+          - not_null
+          - unique
+      - name: product_id
+        description: "Identificador único del producto asociado al presupuesto."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__products')
+              field: product_id
+      - name: quantity
+        description: "Cantidad presupuestada del producto."
+        tests:
+          - not_null
+      - name: month
+        description: "Fecha representando el mes presupuestado."
+        tests:
+          - not_null
+      - name: month_name
+        description: "Nombre del mes (e.g., 'January', 'February') derivado del campo 'month'."
+        tests:
+          - not_null
+      - name: date_load
+        description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
+        tests:
+          - not_null
