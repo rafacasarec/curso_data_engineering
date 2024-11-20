@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: dim_actividad_users
+    description: >
+      Este modelo calcula métricas clave para la capa GOLD:
+      - Número total de usuarios.
+      - Tiempo promedio de entrega entre la creación y la entrega de pedidos.
+      - Distribución de compras por usuario.
+      - Número promedio de sesiones únicas por hora.
+    columns:
+      - name: total_users
+        description: >
+          Número total de usuarios únicos registrados en el sistema.
+        tests:
+          - not_null
+      - name: avg_delivery_time_day
+        description: >
+          Tiempo promedio entre la creación y la entrega de un pedido, medido en días.
+      - name: users_with_one_purchase
+        description: >
+          Número de usuarios que han realizado exactamente una compra.
+        tests:
+          - not_null
+      - name: users_with_two_purchases
+        description: >
+          Número de usuarios que han realizado exactamente dos compras.
+        tests:
+          - not_null
+      - name: users_with_three_or_more_purchases
+        description: >
+          Número de usuarios que han realizado tres o más compras.
+        tests:
+          - not_null
+      - name: avg_sessions_per_hour
+        description: >
+          Número promedio de sesiones únicas por hora.

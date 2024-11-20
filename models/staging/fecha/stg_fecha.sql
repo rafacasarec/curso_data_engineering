@@ -7,7 +7,6 @@ WITH date_spine AS (
 )
 
 SELECT
-    md5(CAST(date_hour AS STRING)) AS date_hour_id, 
     date_hour AS datetime,
     DATE(date_hour) AS date,
     EXTRACT(YEAR FROM date_hour) AS year,

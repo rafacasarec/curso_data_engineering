@@ -8,7 +8,7 @@ source as (
 
 renamed as (
 
-    select
+    select distinct
         md5(coalesce(nullif(SHIPPING_SERVICE, ''), 'sin enviar')) as SHIPPING_SERVICE_ID,
         coalesce(nullif(SHIPPING_SERVICE, ''), 'sin enviar') as SHIPPING_SERVICE,
         SHIPPING_COST:: DECIMAL(10,2) as SHIPPING_COST

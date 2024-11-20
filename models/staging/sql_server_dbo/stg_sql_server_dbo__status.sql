@@ -8,10 +8,9 @@ source as (
 
 renamed as (
 
-    select
+    select distinct
         md5(STATUS) as STATUS_ID,
         STATUS
-    
     from source
 
 )

@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: dim_session_info
+    description: >
+      Este modelo proporciona información detallada sobre cada sesión, incluyendo:
+      - Datos del usuario (nombre, correo electrónico).
+      - Inicio y fin de la sesión.
+      - Duración de la sesión.
+      - Número de páginas vistas y eventos clave relacionados (add_to_cart, checkout, package_shipped).
+    columns:
+      - name: session_id
+        description: >
+          Identificador único de la sesión.
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: >
+          Identificador único del usuario asociado a la sesión.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sql_server_dbo__users')
+              field: user_id
+
+      - name: first_name
+        description: >
+          Nombre del usuario asociado a la sesión.
+        tests:
+          - not_null
+
+      - name: email
+        description: >
+          Correo electrónico del usuario asociado a la sesión.
+        tests:
+          - not_null
+
+      - name: first_event_time_utc
+        description: >
+          Marca de tiempo del primer evento registrado en la sesión.
+        tests:
+          - not_null
+
+      - name: last_event_time_utc
+        description: >
+          Marca de tiempo del último evento registrado en la sesión.
+        tests:
+          - not_null
+
+      - name: session_length_minutes
+        description: >
+          Duración de la sesión en minutos, calculada como la diferencia entre el primer y último evento de la sesión.
+        tests:
+          - not_null
+
+      - name: page_view
+        description: >
+          Número total de eventos "page_view" registrados durante la sesión.
+        tests:
+          - not_null
+
+      - name: add_to_cart
+        description: >
+          Número total de eventos "add_to_cart" registrados durante la sesión.
+        tests:
+          - not_null
+
+
+      - name: checkout
+        description: >
+          Número total de eventos "checkout" registrados durante la sesión.
+        tests:
+          - not_null
+
+      - name: package_shipped
+        description: >
+          Número total de eventos "package_shipped" registrados durante la sesión.
+        tests:
+          - not_null

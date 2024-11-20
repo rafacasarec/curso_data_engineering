@@ -126,10 +126,6 @@ models:
           - unique
       - name: shipping_service
         description: "Método de envío asociado al pedido. Si está vacío, se asigna 'sin enviar'."
-      - name: shipping_cost
-        description: "Costo del envío del pedido."
-        tests:
-          - not_null
       - name: address_id
         description: "Identificador único de la dirección asociada al pedido."
         tests:
@@ -147,10 +143,6 @@ models:
         description: "Descripción de la promoción asociada al pedido. Si no hay promoción, se asigna 'sin promocion'."
       - name: estimated_delivery_at_utc
         description: "Fecha y hora estimada para la entrega del pedido, convertida a UTC."
-      - name: order_cost
-        description: "Costo total del pedido antes de aplicar descuentos o promociones."
-        tests:
-          - not_null
       - name: user_id
         description: "Identificador único del usuario que realizó el pedido."
         tests:
@@ -158,10 +150,6 @@ models:
           - relationships:
               to: ref('stg_sql_server_dbo__users')
               field: user_id
-      - name: order_total
-        description: "Costo total del pedido después de aplicar descuentos y promociones."
-        tests:
-          - not_null
       - name: delivered_at_utc
         description: "Fecha y hora en que se entregó el pedido, convertida a UTC."
       - name: tracking_id
@@ -278,3 +266,27 @@ models:
         description: "Marca de tiempo que indica cuándo se sincronizó el registro en la base de datos."
         tests:
           - not_null
+
+  - name: stg_sql_server_dbo__status
+    description: "Entidad sacada de la tabla orders, para normalizar más mi modelo."
+    columns:
+      - name: STATUS_ID
+        description: "Identificador único del status, generado como un hash (MD5)."
+        tests:
+          - not_null
+          - unique
+      - name: STATUS
+        description: "Tipos de status que encontramos."
+        tests:
+          - not_null
+
+  - name: stg_sql_server_dbo__shipping_service
+    description: "Entidad sacada de la tabla orders, para normalizar más mi modelo."
+    columns:
+      - name: SHIPPING_SERVICE_ID
+        description: "Identificador único del status, generado como un hash (MD5)."
+      - name: SHIPPING_SERVICE
+        description: "Tipos de status que encontramos."
+      - name: SHIPPING_COST
+        description: "Tipos de status que encontramos."
+     
