@@ -29,8 +29,7 @@ with user_orders as (
         on oi.product_id = p.product_id
     left join {{ ref('stg_sql_server_dbo__addresses') }} a
         on u.address_id = a.address_id
-    left join (
-        
+    left join (  
         select promo_id, discount
         from {{ ref('stg_sql_server_dbo__promos') }}
         where status = 'active'
